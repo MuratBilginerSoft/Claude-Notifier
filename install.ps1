@@ -6,7 +6,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-$RepoRaw    = 'https://raw.githubusercontent.com/CHANGEME/claude-notifier/main'
+$RepoRaw    = 'https://raw.githubusercontent.com/MuratBilginerSoft/claude-notifier/main'
 $HelperName = 'notify.ps1'
 $HomeDir    = if ($env:HOME) { $env:HOME } else { $env:USERPROFILE }
 $InstallDir = Join-Path $HomeDir '.claude-notifier'
