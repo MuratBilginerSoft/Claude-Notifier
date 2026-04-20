@@ -1,4 +1,4 @@
-# claude-notifier
+# Claude-Notifier
 
 Claude Code bir işi bitirdiğinde ya da sana bir soru sorduğunda sistem sesi çalar ve masaüstü bildirimi gösterir. Windows, macOS, Linux. Tek satır kurulum. Bağımlılık yok.
 
@@ -11,13 +11,13 @@ Claude Code bir işi bitirdiğinde ya da sana bir soru sorduğunda sistem sesi �
 **Windows (PowerShell):**
 
 ```powershell
-irm https://raw.githubusercontent.com/MuratBilginerSoft/claude-notifier/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.ps1 | iex
 ```
 
 **macOS / Linux (`jq` gerekir):**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/MuratBilginerSoft/claude-notifier/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.sh | bash
 ```
 
 Yeni bir Claude Code oturumu aç ya da `/hooks` komutunu çalıştır.
@@ -56,13 +56,13 @@ Tüm ayarlar environment variable üzerinden — shell'inde veya `~/.claude/sett
 **Windows:**
 
 ```powershell
-irm https://raw.githubusercontent.com/MuratBilginerSoft/claude-notifier/main/install.ps1 -OutFile $env:TEMP\cn.ps1; & $env:TEMP\cn.ps1 -Uninstall; Remove-Item $env:TEMP\cn.ps1
+irm https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.ps1 -OutFile $env:TEMP\cn.ps1; & $env:TEMP\cn.ps1 -Uninstall; Remove-Item $env:TEMP\cn.ps1
 ```
 
 **macOS / Linux:**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/MuratBilginerSoft/claude-notifier/main/install.sh | bash -s -- --uninstall
+curl -fsSL https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.sh | bash -s -- --uninstall
 ```
 
 Uninstall yalnızca `claude-notifier`'ın hook entry'lerini ve helper klasörünü siler. Diğer hook'ların olduğu gibi kalır.
@@ -72,7 +72,7 @@ Uninstall yalnızca `claude-notifier`'ın hook entry'lerini ve helper klasörün
 Bu proje `curl | bash` kalıbını kullanıyor. İstersen önce oku:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/MuratBilginerSoft/claude-notifier/main/install.sh -o install.sh
+curl -fsSL https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.sh -o install.sh
 less install.sh
 bash install.sh
 ```
