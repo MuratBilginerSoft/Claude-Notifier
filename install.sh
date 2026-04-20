@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_RAW="https://raw.githubusercontent.com/CHANGEME/claude-notifier/main"
+HELPER_NAME="notify.sh"
+INSTALL_DIR="$HOME/.claude-notifier"
+HELPER_DEST="$INSTALL_DIR/$HELPER_NAME"
+SETTINGS_DIR="$HOME/.claude"
+SETTINGS_PATH="$SETTINGS_DIR/settings.json"
+
+MODE="install"
+for arg in "$@"; do
+    case "$arg" in
+        --uninstall) MODE="uninstall" ;;
+        *) echo "usage: install.sh [--uninstall]" >&2; exit 2 ;;
+    esac
+done
+
+require_jq() {
+    if ! command -v jq >/dev/null 2>&1; then
+        echo "error: jq is required. Install with:" >&2
+        echo "  macOS:  brew install jq" >&2
+        echo "  Debian: sudo apt install jq" >&2
+        echo "  Fedora: sudo dnf install jq" >&2
+        exit 1
+    fi
+}
+
+install_helper() {
+    mkdir -p "$INSTALL_DIR"
+    if [ -n "${CLAUDE_NOTIFIER_SOURCE:-}" ]; then
+        local src="$CLAUDE_NOTIFIER_SOURCE/scripts/$HELPER_NAME"
+        [ -f "$src" ] || { echo "CLAUDE_NOTIFIER_SOURCE set but $src not found" >&2; exit 1; }
+        cp "$src" "$HELPER_DEST"
+    else
+        curl -fsSL "$REPO_RAW/scripts/$HELPER_NAME" -o "$HELPER_DEST"
+    fi
+    chmod +x "$HELPER_DEST"
+    echo "[OK] Installed helper to $HELPER_DEST"
+}
+
+read_settings() {
+    if [ ! -f "$SETTINGS_PATH" ]; then
+        echo "{}"
+        return
+    fi
+    if ! jq empty "$SETTINGS_PATH" 2>/dev/null; then
+        echo "error: $SETTINGS_PATH is not valid JSON. Aborting without changes." >&2
+        exit 1
+    fi
+    cat "$SETTINGS_PATH"
+}
+
+write_settings() {
+    local content="$1"
+    mkdir -p "$SETTINGS_DIR"
+    local tmp="$SETTINGS_PATH.tmp"
+    printf '%s\n' "$content" > "$tmp"
+    mv "$tmp" "$SETTINGS_PATH"
+}
+
+install_hooks() {
+    local current
+    current="$(read_settings)"
+    local updated
+    updated=$(printf '%s' "$current" | jq '
+        def cn_entry($ev):
+            { hooks: [{
+                type: "command",
+                shell: "bash",
+                async: true,
+                command: "\"$HOME/.claude-notifier/notify.sh\" " + $ev
+            }] };
+        def scrub($ev):
+            (.hooks[$ev] // [])
+            | map(.hooks |= map(select((.command // "") | contains("claude-notifier") | not)))
+            | map(select(.hooks | length > 0));
+        .hooks //= {}
+        | .hooks.Stop         = (scrub("Stop")         + [cn_entry("Stop")])
+        | .hooks.Notification = (scrub("Notification") + [cn_entry("Notification")])
+    ')
+    write_settings "$updated"
+    echo "[OK] Patched $SETTINGS_PATH"
+}
+
+if [ "$MODE" = "install" ]; then
+    require_jq
+    install_helper
+    install_hooks
+    echo ""
+    echo "claude-notifier installed. Restart Claude Code or run /hooks to load the new settings."
+fi
