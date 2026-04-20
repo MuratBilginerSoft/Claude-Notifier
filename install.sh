@@ -116,8 +116,12 @@ uninstall_hooks() {
 
 uninstall_helper() {
     if [ -d "$INSTALL_DIR" ]; then
-        rm -rf "$INSTALL_DIR"
-        echo "[OK] Removed $INSTALL_DIR"
+        if rm -rf "$INSTALL_DIR"; then
+            echo "[OK] Removed $INSTALL_DIR"
+        else
+            echo "error: failed to remove $INSTALL_DIR" >&2
+            exit 1
+        fi
     else
         echo "$INSTALL_DIR not found; skipping."
     fi
