@@ -1,4 +1,4 @@
-param(
+﻿param(
     [Parameter(Mandatory=$true)]
     [ValidateSet('Stop','Notification')]
     [string]$Event
