@@ -23,7 +23,11 @@ function Install-Helper {
         Copy-Item -Force $src $HelperDest
     } else {
         $url = "$RepoRaw/scripts/$HelperName"
-        Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $HelperDest
+        try {
+            Invoke-WebRequest -UseBasicParsing -Uri $url -OutFile $HelperDest
+        } catch {
+            throw "Failed to download helper from ${url}: $_"
+        }
     }
     Write-Host "[OK] Installed helper to $HelperDest"
 }
@@ -65,8 +69,8 @@ function Write-Settings($obj) {
 }
 
 function Build-HookEntry([string]$EventName) {
-    return @{
-        hooks = @(@{
+    return [ordered]@{
+        hooks = @([ordered]@{
             type    = 'command'
             shell   = 'powershell'
             async   = $true
@@ -75,6 +79,7 @@ function Build-HookEntry([string]$EventName) {
     }
 }
 
+# Merge-Hook mutates $settings in place via reference.
 function Merge-Hook($settings, [string]$EventName) {
     if (-not $settings.Contains('hooks')) { $settings['hooks'] = @{} }
     if (-not $settings['hooks'].Contains($EventName)) { $settings['hooks'][$EventName] = @() }
@@ -106,7 +111,7 @@ function Install-Hooks {
 }
 
 if ($Uninstall) {
-    # Stub â€” implemented in Task 5
+    # Stub -- implemented in Task 5
     throw "Uninstall not yet implemented."
 }
 
