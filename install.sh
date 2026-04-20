@@ -86,10 +86,56 @@ install_hooks() {
     echo "[OK] Patched $SETTINGS_PATH"
 }
 
-if [ "$MODE" = "install" ]; then
-    require_jq
-    install_helper
-    install_hooks
-    echo ""
-    echo "claude-notifier installed. Restart Claude Code or run /hooks to load the new settings."
-fi
+uninstall_hooks() {
+    if [ ! -f "$SETTINGS_PATH" ]; then
+        echo "No settings.json found; nothing to unpatch."
+        return
+    fi
+    if ! jq empty "$SETTINGS_PATH" 2>/dev/null; then
+        echo "error: $SETTINGS_PATH is not valid JSON. Aborting." >&2
+        exit 1
+    fi
+    local updated
+    updated=$(jq '
+        def scrub($ev):
+            (.hooks[$ev] // [])
+            | map(.hooks |= map(select((.command // "") | contains("claude-notifier") | not)))
+            | map(select(.hooks | length > 0));
+        if (.hooks // null) == null then .
+        else
+            .hooks.Stop         = scrub("Stop")
+            | .hooks.Notification = scrub("Notification")
+            | (if (.hooks.Stop         | length) == 0 then del(.hooks.Stop)         else . end)
+            | (if (.hooks.Notification | length) == 0 then del(.hooks.Notification) else . end)
+            | (if (.hooks | length)             == 0 then del(.hooks)              else . end)
+        end
+    ' "$SETTINGS_PATH")
+    write_settings "$updated"
+    echo "[OK] Removed claude-notifier hooks from $SETTINGS_PATH"
+}
+
+uninstall_helper() {
+    if [ -d "$INSTALL_DIR" ]; then
+        rm -rf "$INSTALL_DIR"
+        echo "[OK] Removed $INSTALL_DIR"
+    else
+        echo "$INSTALL_DIR not found; skipping."
+    fi
+}
+
+case "$MODE" in
+    install)
+        require_jq
+        install_helper
+        install_hooks
+        echo ""
+        echo "claude-notifier installed. Restart Claude Code or run /hooks to load the new settings."
+        ;;
+    uninstall)
+        require_jq
+        uninstall_hooks
+        uninstall_helper
+        echo ""
+        echo "claude-notifier uninstalled."
+        ;;
+esac
