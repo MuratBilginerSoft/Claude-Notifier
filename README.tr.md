@@ -14,6 +14,13 @@ Claude Code bir işi bitirdiğinde ya da sana bir soru sorduğunda sistem sesi �
 & ([scriptblock]::Create((irm https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.ps1)))
 ```
 
+<details>
+<summary>Neden <code>irm | iex</code> değil?</summary>
+
+`irm | iex` indirilen text'i bir expression olarak değerlendirir, ama `install.ps1` `param(...)` bloğu kullanıyor — `param()` sadece script block başlangıcında geçerli. `[scriptblock]::Create(...)` indirilen text'i gerçek bir script block'a çevirir, `&` operatörü de onu çalıştırır. Böylece parametre geçirmek de kolay olur: `& ([scriptblock]::Create((irm ...))) -Uninstall`.
+
+</details>
+
 **macOS / Linux (`jq` gerekir):**
 
 ```bash

@@ -14,6 +14,13 @@ Play a system sound and show a desktop toast whenever Claude Code finishes a tas
 & ([scriptblock]::Create((irm https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.ps1)))
 ```
 
+<details>
+<summary>Why not <code>irm | iex</code>?</summary>
+
+`irm | iex` evaluates the downloaded text as an expression, but `install.ps1` declares a `param(...)` block — and `param()` is only valid at the start of a script block, not inside an expression. `[scriptblock]::Create(...)` turns the downloaded text into a real script block, and `&` invokes it. This also lets you pass parameters cleanly: `& ([scriptblock]::Create((irm ...))) -Uninstall`.
+
+</details>
+
 **macOS / Linux (requires `jq`):**
 
 ```bash
