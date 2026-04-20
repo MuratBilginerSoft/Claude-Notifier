@@ -11,7 +11,7 @@ Play a system sound and show a desktop toast whenever Claude Code finishes a tas
 **Windows (PowerShell):**
 
 ```powershell
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.ps1)))
+& ([scriptblock]::Create((irm https://cdn.jsdelivr.net/gh/MuratBilginerSoft/Claude-Notifier@main/install.ps1)))
 ```
 
 <details>
@@ -24,7 +24,7 @@ Play a system sound and show a desktop toast whenever Claude Code finishes a tas
 **macOS / Linux (requires `jq`):**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.sh | bash
+curl -fsSL https://cdn.jsdelivr.net/gh/MuratBilginerSoft/Claude-Notifier@main/install.sh | bash
 ```
 
 Open a new Claude Code session or run `/hooks` to load the new settings.
@@ -96,13 +96,13 @@ Example — custom sounds on Windows:
 **Windows:**
 
 ```powershell
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.ps1))) -Uninstall
+& ([scriptblock]::Create((irm https://cdn.jsdelivr.net/gh/MuratBilginerSoft/Claude-Notifier@main/install.ps1))) -Uninstall
 ```
 
 **macOS / Linux:**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.sh | bash -s -- --uninstall
+curl -fsSL https://cdn.jsdelivr.net/gh/MuratBilginerSoft/Claude-Notifier@main/install.sh | bash -s -- --uninstall
 ```
 
 Uninstall removes only `claude-notifier`'s hook entries and its helper directory. Any other hooks you've configured are preserved.
@@ -112,7 +112,7 @@ Uninstall removes only `claude-notifier`'s hook entries and its helper directory
 This project uses the `curl | bash` install pattern. If you prefer to inspect before running:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.sh -o install.sh
+curl -fsSL https://cdn.jsdelivr.net/gh/MuratBilginerSoft/Claude-Notifier@main/install.sh -o install.sh
 less install.sh
 bash install.sh
 ```

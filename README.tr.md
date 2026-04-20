@@ -11,7 +11,7 @@ Claude Code bir işi bitirdiğinde ya da sana bir soru sorduğunda sistem sesi �
 **Windows (PowerShell):**
 
 ```powershell
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.ps1)))
+& ([scriptblock]::Create((irm https://cdn.jsdelivr.net/gh/MuratBilginerSoft/Claude-Notifier@main/install.ps1)))
 ```
 
 <details>
@@ -24,7 +24,7 @@ Claude Code bir işi bitirdiğinde ya da sana bir soru sorduğunda sistem sesi �
 **macOS / Linux (`jq` gerekir):**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.sh | bash
+curl -fsSL https://cdn.jsdelivr.net/gh/MuratBilginerSoft/Claude-Notifier@main/install.sh | bash
 ```
 
 Yeni bir Claude Code oturumu aç ya da `/hooks` komutunu çalıştır.
@@ -96,13 +96,13 @@ Toast'lar ne olduğunu bir bakışta görebilmen için 200 karaktere kadar kısa
 **Windows:**
 
 ```powershell
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.ps1))) -Uninstall
+& ([scriptblock]::Create((irm https://cdn.jsdelivr.net/gh/MuratBilginerSoft/Claude-Notifier@main/install.ps1))) -Uninstall
 ```
 
 **macOS / Linux:**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.sh | bash -s -- --uninstall
+curl -fsSL https://cdn.jsdelivr.net/gh/MuratBilginerSoft/Claude-Notifier@main/install.sh | bash -s -- --uninstall
 ```
 
 Uninstall yalnızca `claude-notifier`'ın hook entry'lerini ve helper klasörünü siler. Diğer hook'ların olduğu gibi kalır.
@@ -112,7 +112,7 @@ Uninstall yalnızca `claude-notifier`'ın hook entry'lerini ve helper klasörün
 Bu proje `curl | bash` kalıbını kullanıyor. İstersen önce oku:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.sh -o install.sh
+curl -fsSL https://cdn.jsdelivr.net/gh/MuratBilginerSoft/Claude-Notifier@main/install.sh -o install.sh
 less install.sh
 bash install.sh
 ```

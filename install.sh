@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_RAW="https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main"
+REPO_RAW="https://cdn.jsdelivr.net/gh/MuratBilginerSoft/Claude-Notifier@main"
 HELPER_NAME="notify.sh"
 INSTALL_DIR="$HOME/.claude-notifier"
 HELPER_DEST="$INSTALL_DIR/$HELPER_NAME"
