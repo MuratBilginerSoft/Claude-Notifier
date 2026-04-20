@@ -11,7 +11,7 @@ Play a system sound and show a desktop toast whenever Claude Code finishes a tas
 **Windows (PowerShell):**
 
 ```powershell
-irm https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.ps1 | iex
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.ps1)))
 ```
 
 **macOS / Linux (requires `jq`):**
@@ -56,7 +56,7 @@ Example — silent mode, only trigger on questions, Turkish text:
 **Windows:**
 
 ```powershell
-irm https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.ps1 -OutFile $env:TEMP\cn.ps1; & $env:TEMP\cn.ps1 -Uninstall; Remove-Item $env:TEMP\cn.ps1
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.ps1))) -Uninstall
 ```
 
 **macOS / Linux:**

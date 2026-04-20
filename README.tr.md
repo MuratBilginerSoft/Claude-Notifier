@@ -11,7 +11,7 @@ Claude Code bir işi bitirdiğinde ya da sana bir soru sorduğunda sistem sesi �
 **Windows (PowerShell):**
 
 ```powershell
-irm https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.ps1 | iex
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.ps1)))
 ```
 
 **macOS / Linux (`jq` gerekir):**
@@ -56,7 +56,7 @@ Tüm ayarlar environment variable üzerinden — shell'inde veya `~/.claude/sett
 **Windows:**
 
 ```powershell
-irm https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.ps1 -OutFile $env:TEMP\cn.ps1; & $env:TEMP\cn.ps1 -Uninstall; Remove-Item $env:TEMP\cn.ps1
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/MuratBilginerSoft/Claude-Notifier/main/install.ps1))) -Uninstall
 ```
 
 **macOS / Linux:**

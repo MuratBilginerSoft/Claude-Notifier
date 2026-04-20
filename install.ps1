@@ -1,5 +1,4 @@
-﻿#Requires -Version 5.1
-[CmdletBinding()]
+﻿# Requires PowerShell 5.1+
 param(
     [switch]$Uninstall
 )
