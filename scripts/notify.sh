@@ -81,15 +81,25 @@ play_sound() {
 
 show_toast() {
     if [ "$TOAST_PREF" != "1" ]; then return 0; fi
+
+    title='Claude Notifier - BrainyTech'
+    icon="$HOME/.claude-notifier/icon.png"
+
     case "$os" in
         Darwin)
+            # osascript's display notification doesn't support custom icons — title only.
+            safe_title=$(printf '%s' "$title" | sed 's/\\/\\\\/g; s/"/\\"/g; s/`/\\`/g; s/\$/\\$/g')
             safe_msg=$(printf '%s' "$msg" | sed 's/\\/\\\\/g; s/"/\\"/g; s/`/\\`/g; s/\$/\\$/g')
-            osascript -e "display notification \"$safe_msg\" with title \"Claude Code\"" 2>/dev/null || \
+            osascript -e "display notification \"$safe_msg\" with title \"$safe_title\"" 2>/dev/null || \
                 echo "toast failed (osascript missing?)" >&2
             ;;
         Linux)
             if command -v notify-send >/dev/null 2>&1; then
-                notify-send "Claude Code" "$msg" 2>/dev/null || true
+                if [ -f "$icon" ]; then
+                    notify-send -i "$icon" "$title" "$msg" 2>/dev/null || true
+                else
+                    notify-send "$title" "$msg" 2>/dev/null || true
+                fi
             else
                 echo "toast unavailable: install libnotify-bin (e.g., apt install libnotify-bin)" >&2
             fi

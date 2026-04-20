@@ -53,14 +53,31 @@ if ($sound -eq '1') {
     } catch { [Console]::Error.WriteLine("sound failed: $_") }
 }
 
+function Escape-Xml([string]$s) {
+    return $s -replace '&','&amp;' -replace '<','&lt;' -replace '>','&gt;' -replace '"','&quot;' -replace "'",'&apos;'
+}
+
+# AUMID registered by install.ps1 (HKCU:\SOFTWARE\Classes\AppUserModelId\...).
+# Registration provides the app name + icon shown in the toast header and
+# makes Windows deliver the popup (unregistered AUMIDs are silenced in 11).
+$AUMID = 'BrainyTech.ClaudeNotifier'
+
 if ($toast -eq '1') {
     try {
+        $xml = @"
+<toast>
+  <visual>
+    <binding template="ToastGeneric">
+      <text>$(Escape-Xml $msg)</text>
+    </binding>
+  </visual>
+</toast>
+"@
         [Windows.UI.Notifications.ToastNotificationManager,Windows.UI.Notifications,ContentType=WindowsRuntime] > $null
-        $x = [Windows.UI.Notifications.ToastNotificationManager]::GetTemplateContent([Windows.UI.Notifications.ToastTemplateType]::ToastText02)
-        $n = $x.GetElementsByTagName('text')
-        $null = $n.Item(0).AppendChild($x.CreateTextNode('Claude Code'))
-        $null = $n.Item(1).AppendChild($x.CreateTextNode($msg))
-        [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier('Claude Code').Show([Windows.UI.Notifications.ToastNotification]::new($x))
+        [Windows.Data.Xml.Dom.XmlDocument,Windows.Data.Xml.Dom.XmlDocument,ContentType=WindowsRuntime] > $null
+        $x = New-Object Windows.Data.Xml.Dom.XmlDocument
+        $x.LoadXml($xml)
+        [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier($AUMID).Show([Windows.UI.Notifications.ToastNotification]::new($x))
     } catch { [Console]::Error.WriteLine("toast failed: $_") }
 }
 

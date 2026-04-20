@@ -40,6 +40,21 @@ install_helper() {
     fi
     chmod +x "$HELPER_DEST"
     echo "[OK] Installed helper to $HELPER_DEST"
+
+    # Icon is non-critical: if download fails, toasts still render without a logo.
+    local icon_dest="$INSTALL_DIR/icon.png"
+    if [ -n "${CLAUDE_NOTIFIER_SOURCE:-}" ]; then
+        local icon_src="$CLAUDE_NOTIFIER_SOURCE/assets/icon.png"
+        if [ -f "$icon_src" ]; then
+            cp "$icon_src" "$icon_dest" && echo "[OK] Installed icon to $icon_dest"
+        fi
+    else
+        if curl -fSL "$REPO_RAW/assets/icon.png" -o "$icon_dest" 2>/dev/null; then
+            echo "[OK] Installed icon to $icon_dest"
+        else
+            echo "[WARN] Could not download icon from $REPO_RAW; toasts will render without a logo."
+        fi
+    fi
 }
 
 read_settings() {

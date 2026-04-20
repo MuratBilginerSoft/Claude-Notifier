@@ -55,6 +55,10 @@ All configuration is through environment variables — set them in your shell or
 
 If the value is invalid or the file is missing, the script logs a warning to stderr and falls back to the platform default.
 
+**Toast branding:**
+
+Toasts appear as "Claude Notifier - BrainyTech" with a bell icon. On **Windows** the name + icon are registered at install time under `HKCU:\SOFTWARE\Classes\AppUserModelId\BrainyTech.ClaudeNotifier` (uninstall removes the key). On **Linux** the icon is loaded via `notify-send -i` from `~/.claude-notifier/icon.png`. macOS `display notification` doesn't support custom icons.
+
 Example — silent mode, only trigger on questions, Turkish text:
 
 ```json

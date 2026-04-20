@@ -55,6 +55,10 @@ Tüm ayarlar environment variable üzerinden — shell'inde veya `~/.claude/sett
 
 Değer geçersizse ya da dosya yoksa script stderr'a uyarı yazar ve platform varsayılanına düşer.
 
+**Toast markası:**
+
+Toast'lar "Claude Notifier - BrainyTech" başlığı ve çan ikonu ile görünür. **Windows**'ta isim + ikon install sırasında `HKCU:\SOFTWARE\Classes\AppUserModelId\BrainyTech.ClaudeNotifier` altına kayıt edilir (uninstall bu anahtarı siler). **Linux**'ta ikon `~/.claude-notifier/icon.png`'den `notify-send -i` ile yüklenir. macOS `display notification` özel ikonu desteklemiyor.
+
 Örnek — sessiz mod, sadece sorularda tetiklen, Türkçe mesaj:
 
 ```json

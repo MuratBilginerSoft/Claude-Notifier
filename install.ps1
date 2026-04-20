@@ -13,6 +13,13 @@ $HelperDest = Join-Path $InstallDir $HelperName
 $SettingsDir  = Join-Path $HomeDir '.claude'
 $SettingsPath = Join-Path $SettingsDir 'settings.json'
 
+# AUMID registered under HKCU so Windows shows our app name + icon in the
+# toast header and actually renders the popup (unregistered AUMIDs are
+# silenced in Windows 11 and only reach the Action Center).
+$Aumid           = 'BrainyTech.ClaudeNotifier'
+$AumidDisplay    = 'Claude Notifier - BrainyTech'
+$AumidRegKey     = "HKCU:\SOFTWARE\Classes\AppUserModelId\$Aumid"
+
 function Install-Helper {
     New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
 
@@ -29,6 +36,22 @@ function Install-Helper {
         }
     }
     Write-Host "[OK] Installed helper to $HelperDest"
+
+    # Icon is non-critical: if download fails, toasts fall back to logo-less
+    # rendering rather than aborting the install.
+    $iconDest = Join-Path $InstallDir 'icon.png'
+    try {
+        if ($env:CLAUDE_NOTIFIER_SOURCE) {
+            $src = Join-Path $env:CLAUDE_NOTIFIER_SOURCE 'assets/icon.png'
+            if (Test-Path $src) { Copy-Item -Force $src $iconDest }
+        } else {
+            Invoke-WebRequest -UseBasicParsing -Uri "$RepoRaw/assets/icon.png" -OutFile $iconDest
+        }
+        if (Test-Path $iconDest) { Write-Host "[OK] Installed icon to $iconDest" }
+    } catch {
+        Write-Host "[WARN] Could not install icon: $_"
+        Write-Host "       Toasts will show without a custom logo."
+    }
 }
 
 function ConvertTo-Hashtable($obj) {
@@ -134,6 +157,23 @@ function Merge-Hook($settings, [string]$EventName) {
     $settings['hooks'][$EventName] = $filtered
 }
 
+function Register-Aumid {
+    New-Item -Path $AumidRegKey -Force | Out-Null
+    New-ItemProperty -Path $AumidRegKey -Name 'DisplayName' -Value $AumidDisplay -PropertyType String -Force | Out-Null
+    $iconPath = Join-Path $InstallDir 'icon.png'
+    if (Test-Path -LiteralPath $iconPath) {
+        New-ItemProperty -Path $AumidRegKey -Name 'IconUri' -Value $iconPath -PropertyType String -Force | Out-Null
+    }
+    Write-Host "[OK] Registered toast AUMID $Aumid"
+}
+
+function Unregister-Aumid {
+    if (Test-Path $AumidRegKey) {
+        Remove-Item -Path $AumidRegKey -Recurse -Force
+        Write-Host "[OK] Unregistered toast AUMID $Aumid"
+    }
+}
+
 function Install-Hooks {
     $settings = Read-Settings
     Merge-Hook $settings 'Stop'
@@ -192,6 +232,7 @@ function Uninstall-Helper {
 
 if ($Uninstall) {
     Uninstall-Hooks
+    Unregister-Aumid
     Uninstall-Helper
     Write-Host ""
     Write-Host "claude-notifier uninstalled."
@@ -199,6 +240,7 @@ if ($Uninstall) {
 }
 
 Install-Helper
+Register-Aumid
 Install-Hooks
 Write-Host ""
 Write-Host "claude-notifier installed. Restart Claude Code or run /hooks to load the new settings."
