@@ -64,7 +64,7 @@ show_toast() {
     if [ "$TOAST_PREF" != "1" ]; then return 0; fi
     case "$os" in
         Darwin)
-            safe_msg=$(printf '%s' "$msg" | sed 's/\\/\\\\/g; s/"/\\"/g')
+            safe_msg=$(printf '%s' "$msg" | sed 's/\\/\\\\/g; s/"/\\"/g; s/`/\\`/g; s/\$/\\$/g')
             osascript -e "display notification \"$safe_msg\" with title \"Claude Code\"" 2>/dev/null || \
                 echo "toast failed (osascript missing?)" >&2
             ;;
