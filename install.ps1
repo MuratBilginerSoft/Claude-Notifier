@@ -88,6 +88,7 @@ function Merge-Hook($settings, [string]$EventName) {
     $filtered = @()
     foreach ($group in $settings['hooks'][$EventName]) {
         $groupHooks = @()
+        if (-not $group['hooks']) { continue }
         foreach ($h in $group['hooks']) {
             if (-not ($h['command'] -and ($h['command'] -match 'claude-notifier'))) {
                 $groupHooks += $h
@@ -125,6 +126,7 @@ function Uninstall-Hooks {
         $keptGroups = @()
         foreach ($group in $settings['hooks'][$eventName]) {
             $keptHooks = @()
+            if (-not $group['hooks']) { continue }
             foreach ($h in $group['hooks']) {
                 if (-not ($h['command'] -and ($h['command'] -match 'claude-notifier'))) {
                     $keptHooks += $h
@@ -152,6 +154,8 @@ function Uninstall-Helper {
     if (Test-Path $InstallDir) {
         Remove-Item -Recurse -Force $InstallDir
         Write-Host "[OK] Removed $InstallDir"
+    } else {
+        Write-Host "$InstallDir not found; skipping."
     }
 }
 
