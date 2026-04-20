@@ -8,6 +8,8 @@ HELPER_DEST="$INSTALL_DIR/$HELPER_NAME"
 SETTINGS_DIR="$HOME/.claude"
 SETTINGS_PATH="$SETTINGS_DIR/settings.json"
 
+trap 'rm -f "$SETTINGS_PATH.tmp"' EXIT
+
 MODE="install"
 for arg in "$@"; do
     case "$arg" in
@@ -33,7 +35,8 @@ install_helper() {
         [ -f "$src" ] || { echo "CLAUDE_NOTIFIER_SOURCE set but $src not found" >&2; exit 1; }
         cp "$src" "$HELPER_DEST"
     else
-        curl -fsSL "$REPO_RAW/scripts/$HELPER_NAME" -o "$HELPER_DEST"
+        curl -fSL "$REPO_RAW/scripts/$HELPER_NAME" -o "$HELPER_DEST" \
+            || { echo "error: failed to download $HELPER_NAME from $REPO_RAW" >&2; exit 1; }
     fi
     chmod +x "$HELPER_DEST"
     echo "[OK] Installed helper to $HELPER_DEST"
