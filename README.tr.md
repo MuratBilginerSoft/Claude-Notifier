@@ -59,6 +59,15 @@ Değer geçersizse ya da dosya yoksa script stderr'a uyarı yazar ve platform va
 
 Toast'lar "Claude Notifier - BrainyTech" başlığı ve çan ikonu ile görünür. **Windows**'ta isim + ikon install sırasında `HKCU:\SOFTWARE\Classes\AppUserModelId\BrainyTech.ClaudeNotifier` altına kayıt edilir (uninstall bu anahtarı siler). **Linux**'ta ikon `~/.claude-notifier/icon.png`'den `notify-send -i` ile yüklenir. macOS `display notification` özel ikonu desteklemiyor.
 
+**Bağlam özeti:**
+
+Toast'lar ne olduğunu bir bakışta görebilmen için 200 karaktere kadar kısa bir önizleme de içerir — ekrana geri dönmeden anlarsın:
+
+- **Notification:** Claude'un sorusu/mesajı (ör. "Claude `git push` çalıştırmak istiyor — onaylıyor musun?").
+- **Stop:** Claude'un cevabının son paragrafı, session transcript'inden çekilir.
+
+Çok satırlı metin tek satıra indirilir ve `…` ile kırpılır. Hook payload yoksa veya parse edilemezse toast generic event mesajına düşer.
+
 Örnek — sessiz mod, sadece sorularda tetiklen, Türkçe mesaj:
 
 ```json

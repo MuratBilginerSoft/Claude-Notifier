@@ -59,6 +59,15 @@ If the value is invalid or the file is missing, the script logs a warning to std
 
 Toasts appear as "Claude Notifier - BrainyTech" with a bell icon. On **Windows** the name + icon are registered at install time under `HKCU:\SOFTWARE\Classes\AppUserModelId\BrainyTech.ClaudeNotifier` (uninstall removes the key). On **Linux** the icon is loaded via `notify-send -i` from `~/.claude-notifier/icon.png`. macOS `display notification` doesn't support custom icons.
 
+**Context excerpt:**
+
+Toasts include a short preview (up to 200 characters) so you can tell at a glance *what* just happened without switching back:
+
+- **Notification:** Claude's prompt message (e.g. "Claude wants to run `git push` — do you approve?").
+- **Stop:** the last paragraph of Claude's response, pulled from the session transcript.
+
+Multiline text is collapsed to a single line and truncated with `…`. If the hook payload is missing or unparseable, the toast falls back to the generic event message.
+
 Example — silent mode, only trigger on questions, Turkish text:
 
 ```json
