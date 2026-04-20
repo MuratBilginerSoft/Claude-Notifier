@@ -2,7 +2,7 @@
 
 Play a system sound and show a desktop toast whenever Claude Code finishes a task or asks you a question. Cross-platform. One-line install. No dependencies.
 
-![demo](./assets/demo.gif)
+![Claude Notifier](./assets/hero.png)
 
 > 🇹🇷 **Türkçe:** [README.tr.md](./README.tr.md)
 

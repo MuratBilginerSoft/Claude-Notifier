@@ -2,7 +2,7 @@
 
 Claude Code bir işi bitirdiğinde ya da sana bir soru sorduğunda sistem sesi çalar ve masaüstü bildirimi gösterir. Windows, macOS, Linux. Tek satır kurulum. Bağımlılık yok.
 
-![demo](./assets/demo.gif)
+![Claude Notifier](./assets/hero.png)
 
 > 🇬🇧 **English:** [README.md](./README.md)
 
