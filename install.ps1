@@ -110,9 +110,57 @@ function Install-Hooks {
     Write-Host "[OK] Patched $SettingsPath"
 }
 
+function Uninstall-Hooks {
+    if (-not (Test-Path $SettingsPath)) {
+        Write-Host "No settings.json found; nothing to unpatch."
+        return
+    }
+    $settings = Read-Settings
+    if (-not $settings.Contains('hooks')) {
+        Write-Host "No hooks section found; nothing to remove."
+        return
+    }
+    foreach ($eventName in @('Stop','Notification')) {
+        if (-not $settings['hooks'].Contains($eventName)) { continue }
+        $keptGroups = @()
+        foreach ($group in $settings['hooks'][$eventName]) {
+            $keptHooks = @()
+            foreach ($h in $group['hooks']) {
+                if (-not ($h['command'] -and ($h['command'] -match 'claude-notifier'))) {
+                    $keptHooks += $h
+                }
+            }
+            if ($keptHooks.Count -gt 0) {
+                $group['hooks'] = $keptHooks
+                $keptGroups += $group
+            }
+        }
+        if ($keptGroups.Count -eq 0) {
+            $settings['hooks'].Remove($eventName)
+        } else {
+            $settings['hooks'][$eventName] = $keptGroups
+        }
+    }
+    if ($settings['hooks'].Count -eq 0) {
+        $settings.Remove('hooks')
+    }
+    Write-Settings $settings
+    Write-Host "[OK] Removed claude-notifier hooks from $SettingsPath"
+}
+
+function Uninstall-Helper {
+    if (Test-Path $InstallDir) {
+        Remove-Item -Recurse -Force $InstallDir
+        Write-Host "[OK] Removed $InstallDir"
+    }
+}
+
 if ($Uninstall) {
-    # Stub -- implemented in Task 5
-    throw "Uninstall not yet implemented."
+    Uninstall-Hooks
+    Uninstall-Helper
+    Write-Host ""
+    Write-Host "claude-notifier uninstalled."
+    exit 0
 }
 
 Install-Helper
