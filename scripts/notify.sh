@@ -38,14 +38,33 @@ os="$(uname -s)"
 
 play_sound() {
     if [ "$SOUND_PREF" != "1" ]; then return 0; fi
+
+    # Per-event overrides (paths to audio files). Empty/invalid falls through to defaults.
+    if [ "$EVENT" = "Stop" ]; then custom="${CLAUDE_NOTIFIER_SOUND_STOP:-}"
+    else                            custom="${CLAUDE_NOTIFIER_SOUND_NOTIFICATION:-}"
+    fi
+    if [ -n "$custom" ] && [ ! -f "$custom" ]; then
+        echo "sound spec not found: $custom; using default" >&2
+        custom=""
+    fi
+
     case "$os" in
         Darwin)
+            if [ -n "$custom" ]; then
+                afplay "$custom" 2>/dev/null || true
+                return 0
+            fi
             if [ "$EVENT" = "Stop" ]; then sound=/System/Library/Sounds/Glass.aiff
             else                            sound=/System/Library/Sounds/Ping.aiff
             fi
             afplay "$sound" 2>/dev/null || true
             ;;
         Linux)
+            if [ -n "$custom" ]; then
+                if command -v paplay >/dev/null 2>&1 && paplay "$custom" 2>/dev/null; then return 0; fi
+                if command -v aplay  >/dev/null 2>&1 && aplay  "$custom" 2>/dev/null; then return 0; fi
+                # Fall through to defaults if custom couldn't be played.
+            fi
             if [ "$EVENT" = "Stop" ]; then fd=/usr/share/sounds/freedesktop/stereo/complete.oga
             else                            fd=/usr/share/sounds/freedesktop/stereo/message.oga
             fi

@@ -39,12 +39,21 @@ Runtime helper her platformda doğru API'yi seçer: Windows'ta `SystemSounds` + 
 
 Tüm ayarlar environment variable üzerinden — shell'inde veya `~/.claude/settings.json` içindeki `env` alanında tanımlayabilirsin.
 
-| Değişken                     | Değerler                  | Varsayılan            | Amaç                                         |
-|------------------------------|---------------------------|-----------------------|----------------------------------------------|
-| `CLAUDE_NOTIFIER_LANG`       | `en`, `tr`                | `en`                  | Mesaj dili                                   |
-| `CLAUDE_NOTIFIER_EVENTS`     | `stop`, `notification`    | `stop,notification`   | Hangi event'ler bildirim tetiklesin (CSV)    |
-| `CLAUDE_NOTIFIER_SOUND`      | `0`, `1`                  | `1`                   | Ses aç/kapa                                  |
-| `CLAUDE_NOTIFIER_TOAST`      | `0`, `1`                  | `1`                   | Toast aç/kapa                                |
+| Değişken                               | Değerler                                 | Varsayılan            | Amaç                                         |
+|----------------------------------------|------------------------------------------|-----------------------|----------------------------------------------|
+| `CLAUDE_NOTIFIER_LANG`                 | `en`, `tr`                               | `en`                  | Mesaj dili                                   |
+| `CLAUDE_NOTIFIER_EVENTS`               | `stop`, `notification`                   | `stop,notification`   | Hangi event'ler bildirim tetiklesin (CSV)    |
+| `CLAUDE_NOTIFIER_SOUND`                | `0`, `1`                                 | `1`                   | Ses aç/kapa                                  |
+| `CLAUDE_NOTIFIER_TOAST`                | `0`, `1`                                 | `1`                   | Toast aç/kapa                                |
+| `CLAUDE_NOTIFIER_SOUND_STOP`           | yerleşik isim ya da ses dosyası yolu     | _(platform varsayılanı)_ | **Stop** event'i için ses override'ı       |
+| `CLAUDE_NOTIFIER_SOUND_NOTIFICATION`   | yerleşik isim ya da ses dosyası yolu     | _(platform varsayılanı)_ | **Notification** event'i için ses override'ı |
+
+**Ses override değerleri:**
+
+- **Windows:** yerleşik isimlerden biri — `Asterisk`, `Beep`, `Exclamation`, `Hand`, `Question` (büyük/küçük harf fark etmez) **ya da** bir `.wav` dosyasının mutlak yolu.
+- **macOS / Linux:** ses dosyasının mutlak yolu. macOS `afplay` kullanır (`.aiff`, `.wav`, `.mp3`, `.m4a` vb. destekler). Linux `paplay`, o yoksa `aplay` ile çalar.
+
+Değer geçersizse ya da dosya yoksa script stderr'a uyarı yazar ve platform varsayılanına düşer.
 
 Örnek — sessiz mod, sadece sorularda tetiklen, Türkçe mesaj:
 
@@ -54,6 +63,17 @@ Tüm ayarlar environment variable üzerinden — shell'inde veya `~/.claude/sett
     "CLAUDE_NOTIFIER_SOUND": "0",
     "CLAUDE_NOTIFIER_EVENTS": "notification",
     "CLAUDE_NOTIFIER_LANG": "tr"
+  }
+}
+```
+
+Örnek — Windows'ta özel sesler:
+
+```json
+{
+  "env": {
+    "CLAUDE_NOTIFIER_SOUND_STOP": "Beep",
+    "CLAUDE_NOTIFIER_SOUND_NOTIFICATION": "C:\\Sounds\\ding.wav"
   }
 }
 ```

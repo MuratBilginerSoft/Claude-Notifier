@@ -39,12 +39,21 @@ The runtime helper picks the right API per platform: `SystemSounds` + WinRT toas
 
 All configuration is through environment variables — set them in your shell or in `~/.claude/settings.json` `env` field.
 
-| Variable                     | Values                    | Default               | Purpose                                      |
-|------------------------------|---------------------------|-----------------------|----------------------------------------------|
-| `CLAUDE_NOTIFIER_LANG`       | `en`, `tr`                | `en`                  | Message language                             |
-| `CLAUDE_NOTIFIER_EVENTS`     | `stop`, `notification`    | `stop,notification`   | Which events trigger notifications (CSV)     |
-| `CLAUDE_NOTIFIER_SOUND`      | `0`, `1`                  | `1`                   | Enable/disable sound                         |
-| `CLAUDE_NOTIFIER_TOAST`      | `0`, `1`                  | `1`                   | Enable/disable toast                         |
+| Variable                               | Values                                      | Default               | Purpose                                      |
+|----------------------------------------|---------------------------------------------|-----------------------|----------------------------------------------|
+| `CLAUDE_NOTIFIER_LANG`                 | `en`, `tr`                                  | `en`                  | Message language                             |
+| `CLAUDE_NOTIFIER_EVENTS`               | `stop`, `notification`                      | `stop,notification`   | Which events trigger notifications (CSV)     |
+| `CLAUDE_NOTIFIER_SOUND`                | `0`, `1`                                    | `1`                   | Enable/disable sound                         |
+| `CLAUDE_NOTIFIER_TOAST`                | `0`, `1`                                    | `1`                   | Enable/disable toast                         |
+| `CLAUDE_NOTIFIER_SOUND_STOP`           | built-in name, or absolute path to audio    | _(platform default)_  | Override sound for the **Stop** event        |
+| `CLAUDE_NOTIFIER_SOUND_NOTIFICATION`   | built-in name, or absolute path to audio    | _(platform default)_  | Override sound for the **Notification** event |
+
+**Sound override values:**
+
+- **Windows:** one of the built-in names `Asterisk`, `Beep`, `Exclamation`, `Hand`, `Question` (case-insensitive), **or** an absolute path to a `.wav` file.
+- **macOS / Linux:** an absolute path to an audio file. macOS plays via `afplay` (supports `.aiff`, `.wav`, `.mp3`, `.m4a`, …). Linux plays via `paplay` with `aplay` fallback.
+
+If the value is invalid or the file is missing, the script logs a warning to stderr and falls back to the platform default.
 
 Example — silent mode, only trigger on questions, Turkish text:
 
@@ -54,6 +63,17 @@ Example — silent mode, only trigger on questions, Turkish text:
     "CLAUDE_NOTIFIER_SOUND": "0",
     "CLAUDE_NOTIFIER_EVENTS": "notification",
     "CLAUDE_NOTIFIER_LANG": "tr"
+  }
+}
+```
+
+Example — custom sounds on Windows:
+
+```json
+{
+  "env": {
+    "CLAUDE_NOTIFIER_SOUND_STOP": "Beep",
+    "CLAUDE_NOTIFIER_SOUND_NOTIFICATION": "C:\\Sounds\\ding.wav"
   }
 }
 ```

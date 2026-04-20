@@ -19,10 +19,37 @@ $messages = @{
 $msg = $messages[$Event][$lang]
 if (-not $msg) { $msg = $messages[$Event]['en'] }
 
+function Invoke-SoundSpec([string]$spec, [string]$fallback) {
+    # $fallback is one of the five built-in names below (trusted).
+    # $spec is user-supplied: accepts a built-in name (case-insensitive) or a path to an audio file.
+    $builtins = @('Asterisk','Beep','Exclamation','Hand','Question')
+    $name = $null
+    $file = $null
+    if (-not [string]::IsNullOrWhiteSpace($spec)) {
+        $match = $builtins | Where-Object { $_ -ieq $spec } | Select-Object -First 1
+        if ($match)                         { $name = $match }
+        elseif (Test-Path -LiteralPath $spec) { $file = $spec }
+        else { [Console]::Error.WriteLine("sound spec not recognized: $spec (not a built-in name or existing file); using default") }
+    }
+    if (-not $name -and -not $file) { $name = $fallback }
+    if ($file) {
+        $player = New-Object System.Media.SoundPlayer $file
+        $player.PlaySync()
+        return
+    }
+    switch ($name) {
+        'Asterisk'    { [System.Media.SystemSounds]::Asterisk.Play() }
+        'Beep'        { [System.Media.SystemSounds]::Beep.Play() }
+        'Exclamation' { [System.Media.SystemSounds]::Exclamation.Play() }
+        'Hand'        { [System.Media.SystemSounds]::Hand.Play() }
+        'Question'    { [System.Media.SystemSounds]::Question.Play() }
+    }
+}
+
 if ($sound -eq '1') {
     try {
-        if ($Event -eq 'Stop') { [System.Media.SystemSounds]::Asterisk.Play() }
-        else                   { [System.Media.SystemSounds]::Exclamation.Play() }
+        if ($Event -eq 'Stop') { Invoke-SoundSpec $env:CLAUDE_NOTIFIER_SOUND_STOP         'Asterisk'    }
+        else                   { Invoke-SoundSpec $env:CLAUDE_NOTIFIER_SOUND_NOTIFICATION 'Exclamation' }
     } catch { [Console]::Error.WriteLine("sound failed: $_") }
 }
 
