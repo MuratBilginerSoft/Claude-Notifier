@@ -35,8 +35,11 @@ function ConvertTo-Hashtable($obj) {
     if ($null -eq $obj) { return $null }
     if ($obj -is [System.Collections.IList]) {
         $arr = @()
-        foreach ($item in $obj) { $arr += ConvertTo-Hashtable $item }
-        return $arr
+        foreach ($item in $obj) { $arr += ,(ConvertTo-Hashtable $item) }
+        # Leading comma prevents PowerShell's `return` from unwrapping
+        # single-element arrays into scalars (which would erase array-ness
+        # before Add-ArraySentinels has a chance to preserve it).
+        return ,$arr
     }
     if ($obj -is [PSCustomObject]) {
         $ht = [ordered]@{}
@@ -60,10 +63,39 @@ function Read-Settings {
     }
 }
 
+# PowerShell 5.1's ConvertTo-Json unwraps single-element arrays nested in
+# hashtables (e.g. @{allow = @("x")} serializes to {"allow":"x"} instead of
+# {"allow":["x"]}). This corrupts array-valued fields like permissions.allow on
+# round-trip. Workaround: before serializing, append a unique sentinel string
+# to every single-element array so ConvertTo-Json emits a proper JSON array.
+# After serialization, strip the sentinel tokens with a regex pass.
+$script:ArraySentinel = '__CN_PRESERVE_ARRAY_SENTINEL__'
+
+function Add-ArraySentinels($obj) {
+    if ($null -eq $obj) { return $null }
+    if ($obj -is [System.Collections.IDictionary]) {
+        foreach ($key in @($obj.Keys)) {
+            $obj[$key] = Add-ArraySentinels $obj[$key]
+        }
+        return $obj
+    }
+    if ($obj -is [System.Collections.IList] -and -not ($obj -is [string])) {
+        $walked = @()
+        foreach ($item in $obj) { $walked += ,(Add-ArraySentinels $item) }
+        if ($walked.Count -eq 1) { return @($walked[0], $script:ArraySentinel) }
+        return $walked
+    }
+    return $obj
+}
+
 function Write-Settings($obj) {
     New-Item -ItemType Directory -Force -Path $SettingsDir | Out-Null
+    $null = Add-ArraySentinels $obj
+    $json = ($obj | ConvertTo-Json -Depth 32)
+    $escaped = [regex]::Escape($script:ArraySentinel)
+    $json = [regex]::Replace($json, ",\s*`"$escaped`"", '')
     $tmp = "$SettingsPath.tmp"
-    ($obj | ConvertTo-Json -Depth 32) | Set-Content -Path $tmp -Encoding UTF8
+    $json | Set-Content -Path $tmp -Encoding UTF8
     Move-Item -Force $tmp $SettingsPath
 }
 
